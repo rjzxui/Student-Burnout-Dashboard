@@ -1,0 +1,41 @@
+:root {
+    --transition-speed: 0.25s;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* Transitions */
+.global-transition {
+    transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+.tab-btn.active {
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.25);
+}
+
+@keyframes dynamicPulseGlow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.6; }
+}
+
+.dynamic-pulse {
+    animation: dynamicPulseGlow 2s infinite ease-in-out;
+}
