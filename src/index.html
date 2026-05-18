@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Burnout Dashboard</title>
+    <!-- Tailwind CSS & Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js & Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-50 font-['Plus_Jakarta_Sans'] antialiased global-transition">
+
+    <!-- Top Navigation Bar -->
+    <nav class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-600/30">
+                <i data-lucide="shield-alert" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <span class="text-lg font-bold tracking-tight block">Aegis Mind</span>
+                <span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Burnout Mitigation Hub</span>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <!-- Survival Mode Toggle -->
+            <button id="survivalToggleBtn" class="flex items-center space-x-2 px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 hover:border-red-500 transition-all group">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse dynamic-pulse"></span>
+                <span class="text-sm font-semibold tracking-wide uppercase text-slate-300 group-hover:text-red-400">Survival Mode</span>
+            </button>
+
+            <!-- Mode Switcher Toggle -->
+            <button id="themeToggleBtn" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition">
+                <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Layout -->
+    <div class="flex min-h-[calc(100vh-73px)]">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 border-r border-slate-800 bg-slate-900/20 p-4 space-y-2">
+            <button data-tab="overview" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-left active bg-indigo-600 text-white">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> <span>Dashboard Core</span>
+            </button>
+            <button data-tab="syllabus" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-left text-slate-400 hover:bg-slate-800/50 hover:text-white">
+                <i data-lucide="book-open" class="w-5 h-5"></i> <span>Syllabus Matrix</span>
+            </button>
+            <button data-tab="planner" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-left text-slate-400 hover:bg-slate-800/50 hover:text-white">
+                <i data-lucide="sparkles" class="w-5 h-5"></i> <span>Adaptive Planner</span>
+            </button>
+            <button data-tab="metrics" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-left text-slate-400 hover:bg-slate-800/50 hover:text-white">
+                <i data-lucide="activity" class="w-5 h-5"></i> <span>Biometrics Logs</span>
+            </button>
+            <button data-tab="timer" class="tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition text-left text-slate-400 hover:bg-slate-800/50 hover:text-white">
+                <i data-lucide="timer" class="w-5 h-5"></i> <span>Focus Protocol</span>
+            </button>
+        </aside>
+
+        <!-- Dynamic Working App Context Panels -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            
+            <!-- Overview Workspace -->
+            <section id="overview-pane" class="tab-pane space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Burnout Meter Component -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
+                        <h3 class="text-sm font-semibold tracking-wide text-slate-400 uppercase">Burnout Risk Index</h3>
+                        <div class="mt-4 flex items-baseline space-x-2">
+                            <span id="burnoutMetricDisplay" class="text-5xl font-extrabold tracking-tight">0%</span>
+                            <span id="burnoutStatusTag" class="text-xs font-bold px-2 py-0.5 rounded-full uppercase bg-emerald-500/10 text-emerald-400">Nominal</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full mt-4 overflow-hidden">
+                            <div id="burnoutProgressBar" class="bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p id="burnoutAdviceString" class="text-xs text-slate-400 mt-4 leading-relaxed">System data nominal. Adaptive algorithms active.</p>
+                    </div>
+
+                    <!-- Sleep Target Metric Card -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h3 class="text-sm font-semibold tracking-wide text-slate-400 uppercase">Sleep Velocity Metrics</h3>
+                        <div class="mt-4 flex items-baseline space-x-2">
+                            <span id="averageSleepDisplay" class="text-5xl font-extrabold tracking-tight">0.0h</span>
+                            <span class="text-slate-400 text-sm font-medium">/ 8h daily baseline</span>
+                        </div>
+                        <div id="sleepEvaluationLabel" class="text-xs text-emerald-400 font-semibold mt-4 flex items-center space-x-1">
+                            <i data-lucide="check-circle" class="w-4 h-4"></i> <span>Sleep threshold checks passed.</span>
+                        </div>
+                    </div>
+
+                    <!-- Core Academic Execution Tracking Indicator -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h3 class="text-sm font-semibold tracking-wide text-slate-400 uppercase">Syllabus Completion Index</h3>
+                        <div class="mt-4 flex items-baseline space-x-2">
+                            <span id="syllabusCompletionDisplay" class="text-5xl font-extrabold tracking-tight">0%</span>
+                            <span class="text-slate-400 text-sm font-medium">chapters completed</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full mt-4 overflow-hidden">
+                            <div id="syllabusProgressBar" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Analytical Visual Analytics Render Graph Matrix Context -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h3 class="text-sm font-semibold tracking-wide text-slate-400 uppercase mb-4">Weekly Effort Allocation Mapping</h3>
+                        <div class="h-64">
+                            <canvas id="productivityTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <h3 class="text-sm font-semibold tracking-wide text-slate-400 uppercase mb-4">Burnout Threat Timeline Profile Matrix</h3>
+                        <div class="h-64">
+                            <canvas id="burnoutTimelineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Syllabus Matrix Pane Workspace View -->
+            <section id="syllabus-pane" class="tab-pane space-y-6 hidden">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Academic Syllabus Architecture Matrix</h2>
+                        <p class="text-sm text-slate-400">Map modules, tracked units, and target objectives across subject profiles.</p>
+                    </div>
+                    <button id="openSubjectModalBtn" class="flex items-center space-x-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition text-sm font-semibold shadow-lg shadow-indigo-600/20">
+                        <i data-lucide="plus" class="w-4 h-4"></i> <span>Add Subject Profile</span>
+                    </button>
+                </div>
+
+                <div id="syllabusGridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards populated via app engine loop pipeline -->
+                </div>
+            </section>
+
+            <!-- Dynamic Adaptive AI Strategic Planner Panel View Workspace -->
+            <section id="planner-pane" class="tab-pane space-y-6 hidden">
+                <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight">Adaptive System Optimization Pipeline</h2>
+                        <p class="text-sm text-slate-400">Algorithmic timeline distribution plans adjusted automatically based on fatigue variables.</p>
+                    </div>
+                    <button id="recomputePlanBtn" class="flex items-center space-x-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition text-sm font-semibold">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i> <span>Optimize Allocation Plan</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div id="aiPlannerOutputArea" class="lg:col-span-2 space-y-4">
+                        <!-- Dynamic calculations displayed here -->
+                    </div>
+                    
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit space-y-6">
+                        <h3 class="text-sm font-bold tracking-wider text-slate-400 uppercase">Algorithmic Factors</h3>
+                        <div class="space-y-4 text-xs">
+                            <div class="flex justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">Neuro-Fatigue Coefficient</span>
+                                <span id="fatigueFactorText" class="font-mono text-slate-200">1.00x</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-800 pb-2">
+                                <span class="text-slate-400">Time-to-Target Deficit Risk</span>
+                                <span id="deficitRiskText" class="font-mono text-slate-200">Optimal</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Survival Recovery Buffer</span>
+                                <span id="survivalBufferText" class="font-mono text-slate-200">Inactive</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Daily Continuous Logging Metrics Input Form Layer Panel View Workspace Tab -->
+            <section id="metrics-pane" class="tab-pane space-y-6 hidden">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">Biometric & Mental Effort Tracking Input Core</h2>
+                    <p class="text-sm text-slate-400">Log internal parameters daily to enhance AI engine calibration precision models.</p>
+                </div>
+
+                <form id="biometricLoggingForm" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 max-w-xl">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Study Sessions Executed (Hours)</label>
+                            <input type="number" step="0.1" name="studyHoursInput" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Rest Phase Duration (Hours)</label>
+                            <input type="number" step="0.1" name="sleepHoursInput" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 font-mono">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Subjective Systemic Stress Rank (1-10 Scale)</label>
+                        <input type="range" min="1" max="10" name="stressRankingSlider" class="w-full accent-indigo-500 bg-slate-800 rounded-lg appearance-none h-2 cursor-pointer">
+                        <div class="flex justify-between text-xs font-mono text-slate-500 mt-1">
+                            <span>1 (Relaxed)</span>
+                            <span>5 (Moderate)</span>
+                            <span>10 (Overloaded)</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition text-sm font-semibold tracking-wide">
+                        Commit Log Entry Pipeline
+                    </button>
+                </form>
+            </section>
+
+            <!-- Focus Timer Panel View Workspace Grid Tab -->
+            <section id="timer-pane" class="tab-pane space-y-6 hidden">
+                <div class="max-w-md mx-auto text-center space-y-8 py-12">
+                    <div>
+                        <h2 class="text-3xl font-extrabold tracking-tight">Adaptive Focus Session Protocol</h2>
+                        <p class="text-sm text-slate-400 mt-2">Adjusts real-time intervals based on dynamic metrics to minimize brain fatigue.</p>
+                    </div>
+
+                    <div class="relative flex items-center justify-center">
+                        <svg class="w-72 h-72 transform -rotate-90">
+                            <circle cx="144" cy="144" r="130" stroke="currentColor" stroke-width="8" class="text-slate-800" fill="transparent" />
+                            <circle id="timerProgressRing" cx="144" cy="144" r="130" stroke="currentColor" stroke-width="8" class="text-indigo-500 transition-all duration-300" fill="transparent" stroke-dasharray="816.8" stroke-dashoffset="0" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center space-y-1">
+                            <span id="countdownTimeDisplay" class="text-6xl font-mono font-extrabold tracking-tighter">25:00</span>
+                            <span id="timerStateLabel" class="text-xs font-bold uppercase tracking-widest text-slate-400">Focus Phase</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center space-x-4">
+                        <button id="primaryTimerControlBtn" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition text-sm font-semibold flex items-center space-x-2 shadow-lg shadow-indigo-600/10">
+                            <i data-lucide="play" class="w-4 h-4"></i> <span id="timerControlString">Initiate Protocol</span>
+                        </button>
+                        <button id="resetTimerControlBtn" class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition">
+                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Subject Creation Modal -->
+    <div id="subjectCreationModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-lg font-bold">Create Dynamic Subject Profile Target</h3>
+                <button id="closeSubjectModalBtn" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form id="subjectCreationForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Subject Title</label>
+                    <input type="text" id="modalSubjectName" required placeholder="e.g. Science (Class 9)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Modules/Chapters</label>
+                    <input type="number" id="modalSubjectChapters" required min="1" placeholder="e.g. 14" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:border-indigo-500 text-sm font-mono">
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition text-sm font-semibold tracking-wide shadow-lg shadow-indigo-600/20">
+                    Inject Profile Parameters
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
