@@ -1,0 +1,21 @@
+{
+  "name": "student-burnout-dashboard",
+  "version": "1.0.0",
+  "description": "An intelligent academic productivity and mental workload management system for students.",
+  "main": "src/index.html",
+  "scripts": {
+    "start": "npx browser-sync start --server 'src' --files 'src/**/*'"
+  },
+  "keywords": [
+    "edtech",
+    "burnout-prevention",
+    "productivity",
+    "adaptive-learning",
+    "student-health"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "browser-sync": "^3.0.2"
+  }
+}
